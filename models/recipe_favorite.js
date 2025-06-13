@@ -3,7 +3,9 @@ module.exports = (sequelize, DataTypes) => {
   const RecipeFavorite = sequelize.define('recipe_favorite', {
     user_id: DataTypes.INTEGER,
     recipe_id: DataTypes.INTEGER
-  }, {});
+  }, {
+    freezeTableName: true
+  });
 
   RecipeFavorite.associate = function(models) {
     RecipeFavorite.belongsTo(models.recipe, {

@@ -4,8 +4,11 @@ module.exports = (sequelize, DataTypes) => {
     name: {
       type: DataTypes.STRING,
       allowNull: false
-    }
-  }, {});
+    },
+    img_url: DataTypes.STRING
+  }, {
+    freezeTableName: true
+  });
   
   RecipeCategory.associate = function(models) {
     RecipeCategory.hasMany(models.recipe, {

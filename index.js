@@ -18,15 +18,20 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(express.json());
 
 // Routing
 const indexRouter = require('./routes/index');
 const articleRoutes = require('./routes/articleRoutes');
 const authRoutes = require('./routes/authRoutes'); 
+const recipeController = require('./routes/recipeRoutes')
+const recipeFavoriteRoutes = require('./routes/recipeFavoriteRoutes') 
 
 app.use('/', indexRouter);
 app.use('/articles', articleRoutes);
 app.use('/auth', authRoutes); 
+app.use('/recipe', recipeController)
+app.use('/recipe-favorite', recipeFavoriteRoutes)
 
 // Sequelize instance
 const sequelize = new Sequelize(

@@ -5,7 +5,9 @@ module.exports = (sequelize, DataTypes) => {
     recipe_id: DataTypes.INTEGER,
     comment: DataTypes.TEXT,
     rating: DataTypes.INTEGER
-  }, {});
+  }, {
+    freezeTableName: true
+  });
 
   RecipeComment.associate = function(models) {
     RecipeComment.belongsTo(models.recipe, {

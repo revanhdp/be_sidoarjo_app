@@ -12,7 +12,9 @@ module.exports = (sequelize, DataTypes) => {
     prep_time: DataTypes.INTEGER,
     cook_time: DataTypes.INTEGER,
     serving: DataTypes.INTEGER
-  }, {});
+  }, {
+    freezeTableName: true
+  });
 
   Recipe.associate = function(models) {
     Recipe.belongsTo(models.recipe_category, {

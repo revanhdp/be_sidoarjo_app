@@ -13,7 +13,6 @@ module.exports = {
     }
   },
 
-   
   async getById(req, res) {
     try {
       const article = await Article.findByPk(req.params.id, {
@@ -26,10 +25,25 @@ module.exports = {
     }
   },
 
+  async getByCategory(req, res) {
+    try {
+        const { categoryId } = req.params;
+
+        const articles = await Article.findAll({
+        where: { category_id: categoryId },
+        include: ['category', 'images', 'author']
+        });
+
+        res.json(articles);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+  },
+
   async create(req, res) {
     try {
-      const { title, desc, slug, category_id, user_id, data_article } = req.body;
-      const article = await Article.create({ title, desc, slug, category_id, user_id, data_article });
+      const { title, desc, slug, category_id, data_article } = req.body;
+      const article = await Article.create({ title, desc, slug, category_id, data_article });
       res.status(201).json(article);
     } catch (err) {
       res.status(500).json({ message: err.message });

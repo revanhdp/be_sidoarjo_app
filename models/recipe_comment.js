@@ -11,13 +11,17 @@ module.exports = (sequelize, DataTypes) => {
 
   RecipeComment.associate = function(models) {
     RecipeComment.belongsTo(models.recipe, {
-      foreignKey: 'recipe_id'
+      foreignKey: 'recipe_id',
+      as: 'recipe'
     });
 
     RecipeComment.belongsTo(models.Users, {
-      foreignKey: 'user_id'
+      foreignKey: 'user_id',
+      as: 'user'
     });
   };
+
+  
 
   return RecipeComment;
 };

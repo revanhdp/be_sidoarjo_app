@@ -11,7 +11,7 @@ const authenticate = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded; // bisa akses id/email di req.user
+    req.user = decoded; 
     next();
   } catch (error) {
     return res.status(401).json({ message: 'Token tidak valid.' });

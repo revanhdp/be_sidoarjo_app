@@ -1,104 +1,87 @@
 'use strict';
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // product
-    await queryInterface.createTable('product', {
-      id: { allowNull: false, autoIncrement: true, primaryKey: true, type: Sequelize.INTEGER },
-      name: { type: Sequelize.STRING },
-      slug: { type: Sequelize.STRING, unique: true },
-      price: { type: Sequelize.STRING },
-      stock: { type: Sequelize.INTEGER },
-      description: { type: Sequelize.TEXT },
-      sold: { type: Sequelize.INTEGER },
-      createdAt: { allowNull: false, type: Sequelize.DATE },
-      updatedAt: { allowNull: false, type: Sequelize.DATE }
+    // product table
+    await queryInterface.createTable('products', {
+      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      name: { type: Sequelize.STRING, allowNull: false },
+      price: { type: Sequelize.STRING, allowNull: false },
+      stock: { type: Sequelize.INTEGER, allowNull: true },
+      description: { type: Sequelize.TEXT, allowNull: true },
+      sold: { type: Sequelize.INTEGER, allowNull: true },
+      slug: { type: Sequelize.STRING, allowNull: true },
+      createdAt: Sequelize.DATE,
+      updatedAt: Sequelize.DATE
     });
 
-    // product_img
-    await queryInterface.createTable('product_img', {
-      id: { allowNull: false, autoIncrement: true, primaryKey: true, type: Sequelize.INTEGER },
+    // product_img table
+    await queryInterface.createTable('product_imgs', {
+      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
       img_url: { type: Sequelize.STRING },
-      product_id: { type: Sequelize.INTEGER, references: { model: 'product', key: 'id' }, onDelete: 'CASCADE' },
-      is_featured: { type: Sequelize.BOOLEAN },
-      createdAt: { allowNull: false, type: Sequelize.DATE },
-      updatedAt: { allowNull: false, type: Sequelize.DATE }
+      product_id: { type: Sequelize.INTEGER, references: { model: 'products', key: 'id' }, onDelete: 'CASCADE' },
+      is_featured: { type: Sequelize.BOOLEAN, defaultValue: false },
+      createdAt: Sequelize.DATE,
+      updatedAt: Sequelize.DATE
     });
 
-    // product_review
-    await queryInterface.createTable('product_review', {
-      id: { allowNull: false, autoIncrement: true, primaryKey: true, type: Sequelize.INTEGER },
+    // product_review table
+    await queryInterface.createTable('product_reviews', {
+      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
       comment: { type: Sequelize.STRING },
-      product_id: { type: Sequelize.INTEGER, references: { model: 'product', key: 'id' }, onDelete: 'CASCADE' },
+      product_id: { type: Sequelize.INTEGER, references: { model: 'products', key: 'id' }, onDelete: 'CASCADE' },
       rating: { type: Sequelize.BOOLEAN },
       user_id: { type: Sequelize.INTEGER },
-      createdAt: { allowNull: false, type: Sequelize.DATE },
-      updatedAt: { allowNull: false, type: Sequelize.DATE }
+      createdAt: Sequelize.DATE,
+      updatedAt: Sequelize.DATE
     });
 
-    // product_cart
-    await queryInterface.createTable('product_cart', {
-      id: { allowNull: false, autoIncrement: true, primaryKey: true, type: Sequelize.INTEGER },
-      product_id: { type: Sequelize.STRING },
+    // product_variant table
+    await queryInterface.createTable('product_variants', {
+      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      product_id: { type: Sequelize.INTEGER, references: { model: 'products', key: 'id' }, onDelete: 'CASCADE' },
+      name: { type: Sequelize.STRING },
+      createdAt: Sequelize.DATE,
+      updatedAt: Sequelize.DATE
+    });
+
+    // product_size table
+    await queryInterface.createTable('product_sizes', {
+      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      product_id: { type: Sequelize.INTEGER, references: { model: 'products', key: 'id' }, onDelete: 'CASCADE' },
+      name: { type: Sequelize.STRING },
+      createdAt: Sequelize.DATE,
+      updatedAt: Sequelize.DATE
+    });
+
+    // product_cart table
+    await queryInterface.createTable('product_carts', {
+      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      product_id: { type: Sequelize.INTEGER, references: { model: 'products', key: 'id' }, onDelete: 'CASCADE' },
       user_id: { type: Sequelize.INTEGER },
-      createdAt: { allowNull: false, type: Sequelize.DATE },
-      updatedAt: { allowNull: false, type: Sequelize.DATE }
+      createdAt: Sequelize.DATE,
+      updatedAt: Sequelize.DATE
     });
 
-    // product_promo_code
-    await queryInterface.createTable('product_promo_code', {
-      id: { allowNull: false, autoIncrement: true, primaryKey: true, type: Sequelize.INTEGER },
-      product_id: { type: Sequelize.STRING },
-      code: { type: Sequelize.STRING },
+    // product_promo_code table
+    await queryInterface.createTable('product_promo_codes', {
+      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      product_id: { type: Sequelize.INTEGER, references: { model: 'products', key: 'id' }, onDelete: 'CASCADE' },
+      code: { type: Sequelize.INTEGER },
       discount: { type: Sequelize.INTEGER },
-      createdAt: { allowNull: false, type: Sequelize.DATE },
-      updatedAt: { allowNull: false, type: Sequelize.DATE }
-    });
-
-    // product_variant
-    await queryInterface.createTable('product_variant', {
-      id: { allowNull: false, autoIncrement: true, primaryKey: true, type: Sequelize.INTEGER },
-      name: { type: Sequelize.STRING },
-      createdAt: { allowNull: false, type: Sequelize.DATE },
-      updatedAt: { allowNull: false, type: Sequelize.DATE }
-    });
-
-    // product_variant_bridge
-    await queryInterface.createTable('product_variant_bridge', {
-      id: { allowNull: false, autoIncrement: true, primaryKey: true, type: Sequelize.INTEGER },
-      product_id: { type: Sequelize.STRING },
-      variant_id: { type: Sequelize.STRING },
-      createdAt: { allowNull: false, type: Sequelize.DATE },
-      updatedAt: { allowNull: false, type: Sequelize.DATE }
-    });
-
-    // product_size
-    await queryInterface.createTable('product_size', {
-      id: { allowNull: false, autoIncrement: true, primaryKey: true, type: Sequelize.INTEGER },
-      name: { type: Sequelize.STRING },
-      createdAt: { allowNull: false, type: Sequelize.DATE },
-      updatedAt: { allowNull: false, type: Sequelize.DATE }
-    });
-
-    // product_size_bridge
-    await queryInterface.createTable('product_size_bridge', {
-      id: { allowNull: false, autoIncrement: true, primaryKey: true, type: Sequelize.INTEGER },
-      product_id: { type: Sequelize.STRING },
-      size_id: { type: Sequelize.STRING },
-      createdAt: { allowNull: false, type: Sequelize.DATE },
-      updatedAt: { allowNull: false, type: Sequelize.DATE }
+      createdAt: Sequelize.DATE,
+      updatedAt: Sequelize.DATE
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('product_size_bridge');
-    await queryInterface.dropTable('product_size');
-    await queryInterface.dropTable('product_variant_bridge');
-    await queryInterface.dropTable('product_variant');
-    await queryInterface.dropTable('product_promo_code');
-    await queryInterface.dropTable('product_cart');
-    await queryInterface.dropTable('product_review');
-    await queryInterface.dropTable('product_img');
-    await queryInterface.dropTable('product');
+    await queryInterface.dropTable('product_promo_codes');
+    await queryInterface.dropTable('product_carts');
+    await queryInterface.dropTable('product_sizes');
+    await queryInterface.dropTable('product_variants');
+    await queryInterface.dropTable('product_reviews');
+    await queryInterface.dropTable('product_imgs');
+    await queryInterface.dropTable('products');
   }
 };

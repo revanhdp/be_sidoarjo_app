@@ -32,6 +32,8 @@ module.exports = (sequelize, DataTypes) => {
       as: 'role'
     });
 
+  
+
     // Jika ada hubungan dengan Article:
     // Users.hasMany(models.Article, {
     //   foreignKey: 'user_id',

@@ -28,14 +28,18 @@ const authRoutes = require('./routes/authRoutes');
 const recipeController = require('./routes/recipeRoutes')
 const recipeFavoriteRoutes = require('./routes/recipeFavoriteRoutes') 
 const recipeCommentRoutes = require('./routes/recipeCommentRoutes')
+const productRoutes = require('./routes/productRoutes');
+
 
 app.use('/', indexRouter);
+app.use('/api', productRoutes);
 app.use('/articles', articleRoutes);
 app.use('/articles-img', articleImg);
 app.use('/auth', authRoutes); 
 app.use('/recipe', recipeController)
 app.use('/recipe-favorite', recipeFavoriteRoutes)
 app.use('/recipe-comment', recipeCommentRoutes)
+
 
 // Sequelize instance
 const sequelize = new Sequelize(

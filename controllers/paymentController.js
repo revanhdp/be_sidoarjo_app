@@ -10,20 +10,39 @@ module.exports = {
     }
   },
 
-  async create(req, res) {
+   async create(req, res) {
     try {
-      const { user_id, order_id, payment_method_id, payment_proof } = req.body;
+      const { order_id, payment_method_id, payment_method_name, amount, status } = req.body;
+
+      if (!req.file) {
+        return res.status(400).json({ message: 'Payment proof is required' });
+      }
+
+      if (!req.user || !req.user.id) {
+        return res.status(401).json({ message: 'Unauthorized: User not found in token' });
+      }
+
       const payment = await Payment.create({
-        user_id,
         order_id,
+        user_id: req.user.id,
         payment_method_id,
-        payment_proof,
-        status: 'pending',
-        confirmed_at: null
+        payment_method_name,
+        amount,
+        status,
+        payment_proof: req.file.path, // dari Cloudinary
       });
-      res.status(201).json(payment);
+
+      res.status(201).json({
+        success: true,
+        message: 'Payment created successfully',
+        data: payment,
+      });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      console.error('❌ Error creating payment:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to create payment',
+      });
     }
   },
 

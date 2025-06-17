@@ -29,10 +29,14 @@ const recipeController = require('./routes/recipeRoutes')
 const recipeFavoriteRoutes = require('./routes/recipeFavoriteRoutes') 
 const recipeCommentRoutes = require('./routes/recipeCommentRoutes')
 const productRoutes = require('./routes/productRoutes');
+const orderRoutes = require('./routes/orderRoutes')
+const paymentRoutes = require('./routes/paymentRoutes')
 
 
 app.use('/', indexRouter);
 app.use('/api', productRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/payment', paymentRoutes);
 app.use('/articles', articleRoutes);
 app.use('/articles-img', articleImg);
 app.use('/auth', authRoutes); 
@@ -62,10 +66,19 @@ app.get('/', (req, res) => {
   res.send('Welcome to Lifestyle Sidoarjo API');
 });
 
-// Global error handler (opsional)
+// Global error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+  console.error('Error details:', {
+    message: err.message,
+    stack: err.stack,
+    name: err.name
+  });
+  
+  res.status(500).json({ 
+    error: 'Something went wrong!',
+    message: err.message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
 });
 
 app.listen(port, () => {

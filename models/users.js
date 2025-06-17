@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     tableName: 'Users',
-    timestamps: false // tambahkan jika tabel tidak memakai createdAt/updatedAt
+    timestamps: false,
   });
 
   Users.associate = (models) => {
@@ -32,7 +32,10 @@ module.exports = (sequelize, DataTypes) => {
       as: 'role'
     });
 
-  
+    Users.hasMany(models.Order, {
+      foreignKey: 'user_id',
+      as: 'orders'
+    });
 
     // Jika ada hubungan dengan Article:
     // Users.hasMany(models.Article, {

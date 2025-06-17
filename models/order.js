@@ -10,16 +10,58 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    status: {
-      type: DataTypes.ENUM('pending', 'paid', 'cancelled'),
-      defaultValue: 'pending'
+    full_name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: ''
     },
-    payment_status: {
-      type: DataTypes.ENUM('unpaid', 'waiting', 'paid', 'rejected'),
-      defaultValue: 'unpaid'
+    phone_number: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: ''
+    },
+    address_detail: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      defaultValue: ''
+    },
+    city: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: ''
+    },
+    postal_code: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: ''
+    },
+    shipping_method: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: ''
+    },
+    shipping_cost: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 0
+    },
+    service_name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: ''
+    },
+    service_cost: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 0
+    },
+    status: {
+      type: DataTypes.ENUM('pending', 'processing', 'shipped', 'delivered', 'cancelled'),
+      defaultValue: 'pending'
     }
   }, {
     tableName: 'orders',
+    timestamps: true,
     underscored: true
   });
 
@@ -28,9 +70,15 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'user_id',
       as: 'user'
     });
+
     Order.hasMany(models.Payment, {
       foreignKey: 'order_id',
       as: 'payments'
+    });
+
+    Order.hasMany(models.OrderItem, {
+      foreignKey: 'order_id',
+      as: 'items'
     });
   };
 

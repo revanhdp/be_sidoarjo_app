@@ -20,6 +20,19 @@ module.exports = {
     }
   },
 
+  async getById(req, res) {
+    try {
+      const { id } = req.params;
+      const method = await PaymentMethod.findByPk(id);
+      if (!method) {
+        return res.status(404).json({ message: 'Payment method not found' });
+      }
+      res.json(method);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+
   async delete(req, res) {
     try {
       await PaymentMethod.destroy({ where: { id: req.params.id } });

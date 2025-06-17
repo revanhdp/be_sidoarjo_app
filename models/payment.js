@@ -18,8 +18,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     status: {
-      type: DataTypes.ENUM('pending', 'accepted', 'rejected'),
-      defaultValue: 'pending'
+      type: DataTypes.ENUM('Menunggu Konfirmasi', 'Accepted', 'Rejected'),
+      defaultValue: 'Menunggu Konfirmasi'
     },
     confirmed_at: {
       type: DataTypes.DATE,

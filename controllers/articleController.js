@@ -1,4 +1,4 @@
-const { Article, CategoryArticle, ArticleImg, Users } = require('../models');
+const { sequelize, Article, CategoryArticle, ArticleImg, Users } = require('../models');
 
 module.exports = {
     // Mengambil semua article
@@ -61,11 +61,22 @@ module.exports = {
   },
 
   async update(req, res) {
+    const t = await sequelize.transaction();
     try {
-      const updated = await Article.update(req.body, { where: { id: req.params.id } });
-      res.json({ message: 'Updated', updated });
-    } catch (err) {
-      res.status(500).json({ message: err.message });
+      const { id } = req.params;
+      const { title, desc, slug, category_id, data_article } = req.body;
+
+      const article = await Article.findByPk(id);
+      if (!article) return res.status(404).json({ message: 'Artikel tidak ditemukan' });
+
+      await article.update({ title, desc, slug, category_id, data_article }, { transaction: t });
+
+      await t.commit();
+      res.status(200).json({ message: 'Artikel berhasil diperbarui', article });
+    } catch (error) {
+      await t.rollback();
+      console.error(error);
+      res.status(500).json({ message: 'Gagal memperbarui artikel', error: error.message });
     }
   },
 
@@ -75,6 +86,51 @@ module.exports = {
       res.json({ message: 'Deleted' });
     } catch (err) {
       res.status(500).json({ message: err.message });
+    }
+  },
+
+  async createFullArticle(req, res) {
+    const t = await sequelize.transaction();
+    try {
+      const { title, desc, slug, category_id, data_article } = req.body;
+      const files = req.files;
+
+      if (!files || files.length !== 3) {
+        return res.status(400).json({ message: 'Harus upload 3 gambar: 1 utama, 2 fitur' });
+      }
+
+      // 1. Buat artikel
+      const article = await Article.create({
+        title,
+        desc,
+        slug,
+        category_id,
+        data_article,
+      }, { transaction: t });
+
+      const article_id = article.id;
+
+      // 2. Upload gambar
+      await ArticleImg.create({
+        article_id,
+        img_url: files[0].path,
+        is_feature: false,
+      }, { transaction: t });
+
+      for (let i = 1; i < 3; i++) {
+        await ArticleImg.create({
+          article_id,
+          img_url: files[i].path,
+          is_feature: true,
+        }, { transaction: t });
+      }
+
+      await t.commit();
+      res.status(201).json({ message: 'Artikel dan gambar berhasil dibuat', article });
+    } catch (error) {
+      await t.rollback();
+      console.error(error);
+      res.status(500).json({ message: 'Gagal membuat artikel', error: error.message });
     }
   }
 };

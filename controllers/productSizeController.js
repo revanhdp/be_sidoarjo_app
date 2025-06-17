@@ -3,9 +3,11 @@ const { ProductSize } = require('../models');
 module.exports = {
   async create(req, res) {
     try {
+      console.log("Body:", req.body);
       const size = await ProductSize.create(req.body);
       res.status(201).json(size);
     } catch (err) {
+      console.error(err);
       res.status(500).json({ message: err.message });
     }
   },

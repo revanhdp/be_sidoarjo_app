@@ -1,8 +1,15 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const ProductSize = sequelize.define('ProductSize', {
-    name: DataTypes.STRING,
-    product_id: DataTypes.INTEGER
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    product_id:{
+      type: DataTypes.INTEGER,
+      allowNull: true
+    }
+    
   }, {
     tableName: 'product_sizes'
   });

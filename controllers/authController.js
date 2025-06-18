@@ -176,10 +176,80 @@ const logout = (req, res) => {
   return res.status(200).json({ message: 'Logout berhasil' });
 };
 
+const updateUser = async (req, res) => {
+  try {
+    const userId = req.params.id; // ID user yang akan diupdate
+    // Data yang mungkin diupdate
+    const { email, password, first_name, last_name, address, interest, favorite } = req.body;
+
+    // Cari user berdasarkan ID
+    const user = await Users.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User tidak ditemukan' });
+    }
+
+    // Objek untuk menampung data yang akan diupdate
+    const updateData = {};
+
+    // Tangani upload gambar jika ada file yang diunggah
+    // req.file akan tersedia jika middleware upload.single('img_url') digunakan pada route
+    if (req.file) {
+      updateData.img_url = req.file.path; // Cloudinary secure_url ada di req.file.path
+    }
+
+    // Update email jika disediakan dan berbeda dari email saat ini,
+    // serta belum digunakan oleh user lain
+    if (email && email !== user.email) {
+      const existingUserWithEmail = await Users.findOne({ where: { email } });
+      // Pastikan email baru tidak dimiliki oleh user lain (selain user yang sedang diupdate)
+      if (existingUserWithEmail && existingUserWithEmail.id != userId) {
+        return res.status(400).json({ message: 'Email sudah terdaftar oleh user lain' });
+      }
+      updateData.email = email;
+    }
+
+    // Update password jika disediakan (akan di-hash ulang)
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    // Update field lain jika disediakan dalam request body
+    if (first_name) updateData.first_name = first_name;
+    if (last_name) updateData.last_name = last_name;
+    if (address) updateData.address = address;
+    if (interest) updateData.interest = interest;
+    if (favorite) updateData.favorite = favorite;
+
+    // Lakukan update pada instance user
+    await user.update(updateData);
+
+    // Kirim respons dengan data user yang sudah diupdate (kecuali password)
+    return res.status(200).json({
+      message: 'Profil user berhasil diperbarui',
+      user: {
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        img_url: user.img_url, // Sertakan URL gambar yang baru
+        address: user.address,
+        interest: user.interest,
+        favorite: user.favorite,
+        role_id: user.role_id
+      }
+    });
+
+  } catch (error) {
+    console.error("Error updating user:", error); // Log error untuk debugging
+    return res.status(500).json({ message: 'Terjadi kesalahan saat memperbarui user', error: error.message });
+  }
+};
+
 module.exports = {
   register,
   login,
   registerAdmin,
   logout,
-  getMe
+  getMe,
+  updateUser
 };

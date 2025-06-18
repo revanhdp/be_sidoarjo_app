@@ -1,4 +1,4 @@
-const {recipe, recipe_category, recipe_comment, recipe_favorite} = require('../models')
+const {recipe, recipe_category, recipe_comment, recipe_favorite, Sequelize} = require('../models')
 
 module.exports = {
     async getAll(req, res) {
@@ -116,6 +116,51 @@ module.exports = {
         res.json({ message: 'Recipe deleted' });
         } catch (error) {
         res.status(400).json({ message: error.message });
+        }
+    },
+
+        async getTrendingRecipes(req, res) {
+         try {
+            const { limit = 3 } = req.query; // Default limit 3
+            const recipes = await recipe.findAll({ 
+                attributes: [
+                    'id',
+                    'title',
+                    'desc',
+                    'img_url',
+                    'slug',
+                    [
+                        Sequelize.fn('COUNT', Sequelize.col('recipe_favorites.id')),
+                        'favoriteCount'
+                    ]
+                ],
+                include: [
+                    {
+                        model: recipe_category, 
+                        as: 'recipe_category',
+                        attributes: ['name']
+                    },
+                    {
+                        model: recipe_favorite, 
+                        as: 'recipe_favorites',
+                        attributes: [],
+                        duplicating: false
+                    }
+                ],
+                group: ['Recipe.id', 'recipe_category.id'],
+                order: [[Sequelize.literal('favoriteCount'), 'DESC']],
+                limit: parseInt(limit)
+            });
+
+            const formattedRecipes = recipes.map(recipe => ({
+                ...recipe.toJSON(),
+                favoriteCount: parseInt(recipe.dataValues.favoriteCount)
+            }));
+
+            res.json(formattedRecipes);
+        } catch (error) {
+            console.error('Error fetching trending recipes:', error);
+            res.status(500).json({ message: 'Failed to fetch trending recipes' });
         }
     }
 }

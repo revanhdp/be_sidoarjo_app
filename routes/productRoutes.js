@@ -5,7 +5,9 @@ const productVariantController = require('../controllers/productVariantControlle
 const productSizeController = require('../controllers/productSizeController');
 const productImgController = require('../controllers/productImgController');
 const productCategoryController = require('../controllers/productCategoryController');
+const reviewController = require('../controllers/productReviewController')
 const upload = require('../middlewares/cloudinaryStorageProduct')
+const authenticate = require("../middlewares/authMiddleware")
 
 // Product routes
 router.get('/products', productController.getAll);
@@ -36,5 +38,12 @@ router.delete('/images/:id', productImgController.delete);
 // Category Routes
 router.get('/categories', productCategoryController.getAll);
 router.post('/categories', productCategoryController.create);
+
+// Review Routes
+router.get('/reviews/:productId/reviews', reviewController.getProductReviews);
+router.post('/reviews/:productId/reviews',  authenticate,  reviewController.createReview);
+router.get('/reviews/:productId/reviews/user', authenticate, reviewController.getUserReview);
+router.put('/reviews/:reviewId', authenticate, reviewController.updateReview);
+router.delete('/reviews/:reviewId', authenticate, reviewController.deleteReview);
 
 module.exports = router;

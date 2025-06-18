@@ -9,11 +9,12 @@ router.get('/', recipeController.getAll);
 router.get('/categories', recipeController.getAllCategory)
 router.get('/category/:categoryId', recipeController.getByCategory);
 router.get('/:id', recipeController.getById);
+router.get('/recipes/trending', recipeController.getTrendingRecipes)
 
 // Admin Router
-router.post('/', isAdmin, upload.single('img_url'), recipeController.create);
-router.put('/:id', isAdmin, recipeController.update);
-router.delete('/:id', isAdmin, recipeController.delete);
+router.post('/', upload.single('img_url'), recipeController.create);
+router.put('/:id', recipeController.update);
+router.delete('/:id', recipeController.delete);
 
 module.exports = router;
 
